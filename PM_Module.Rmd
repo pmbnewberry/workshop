@@ -1,0 +1,47 @@
+---
+title: "Project Management"
+author: "Mike Newberry"
+date: "May 16, 2018"
+output: html_document
+---
+
+```{r start, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load packages, include = FALSE}
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+library(tidyverse)
+```
+
+```{r data import}
+mers <-read.csv('cases.csv')
+```
+
+Bring in the MERS data previously used. 
+
+```{r find the epidemic day}
+mers$hospitalized[890] <- c('2015-02-20')
+mers <- mers[-471,] #fix the data
+
+mers$onset2 <- ymd(mers$onset)
+mers$hospitalized2 <- ymd(mers$hospitalized) #make dates a continuous variable
+
+day0 <- min(na.omit(mers$onset2)) #earliest onset?
+
+mers$epi.day <- as.numeric(mers$onset2 - day0) #generate epidemic days as a new numeric column
+
+```
+Generate data for epidemic day.
+
+Plot cases over epidemic days. 
+```{r MERS, echo=FALSE}
+ggplot(mers)+
+  geom_bar(mapping = aes(x = epi.day)) +
+  labs(x = 'Epidemic day', y = 'Case count', title ='Global count of MERS cases by date of symptom onset',
+       caption = "Data from: https://github.com/rambaut/MERS-Cases/blob/gh-pages/data/cases.csv")
+```
+
+
